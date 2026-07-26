@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+
+  <title>AgentBridge Mobile Chat</title>
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Firebase compat SDKs for simple static browser usage -->
+ 
+<script src="firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+
+</head>
+
+<body>
+  <div class="app-shell">
+    <header class="top-bar">
+      <div>
+        <div class="eyebrow">AgentBridge</div>
+        <h1>Mobile Web Chat</h1>
+      </div>
+
+      <div id="connectionPill" class="connection-pill offline">
+        Offline
+      </div>
+    </header>
+
+    <section id="warningBanner" class="warning-banner hidden">
+      <div class="warning-title" id="warningTitle">Context warning</div>
+      <div class="warning-message" id="warningMessage">
+        Token usage is getting high.
+      </div>
+    </section>
+
+    <section class="session-card">
+      <div class="session-header">
+        <div>
+          <div class="section-label">Active Session</div>
+          <div id="threadShort" class="thread-short">No active thread</div>
+        </div>
+
+        <button id="refreshButton" class="icon-button" type="button" title="Refresh">
+          ↻
+        </button>
+      </div>
+
+      <div class="session-grid">
+        <div class="session-item">
+          <span class="item-label">Started</span>
+          <span id="startedAt" class="item-value">Unknown</span>
+        </div>
+
+        <div class="session-item">
+          <span class="item-label">Questions</span>
+          <span id="questionCount" class="item-value">0</span>
+        </div>
+
+        <div class="session-item">
+          <span class="item-label">Tokens</span>
+          <span id="totalTokens" class="item-value">0</span>
+        </div>
+
+        <div class="session-item">
+          <span class="item-label">Usage</span>
+          <span id="usagePercent" class="item-value">0%</span>
+        </div>
+      </div>
+
+      <div class="usage-bar-wrap">
+        <div id="usageBar" class="usage-bar"></div>
+      </div>
+
+    <div class="notification-row">
+        <label>
+            <input type="checkbox" id="soundToggle" checked>
+            🔔 Sound Notification
+        </label>
+    </div>
+
+      <div class="session-actions">
+        <button id="saveNotesButton" class="secondary-button" type="button">
+          Save Session Notes
+        </button>
+
+        <button id="newSessionButton" class="danger-button" type="button">
+          New AI Session
+        </button>
+      </div>
+    </section>
+
+    <main id="chatList" class="chat-list">
+      <div class="empty-state">
+        <div class="empty-icon">🤖</div>
+        <div class="empty-title">Waiting for AgentBridge history</div>
+        <div class="empty-subtitle">
+          Messages will appear here after AgentBridge writes to Firebase history.
+        </div>
+      </div>
+    </main>
+
+    <form id="chatForm" class="composer" autocomplete="off">
+      <textarea
+        id="messageInput"
+        rows="1"
+        placeholder="Type a message to ChipAgents..."
+        spellcheck="true"
+      ></textarea>
+
+      <button id="sendButton" class="send-button" type="submit">
+        Send
+      </button>
+    </form>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+
+<audio id="replySound" preload="auto">
+  <source src="ping.mp3" type="audio/mpeg">
+</audio>
+
+  <script src="app.js"></script>
+</body>
+</html>
