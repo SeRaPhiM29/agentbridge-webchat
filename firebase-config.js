@@ -47,5 +47,6 @@ window.AGENTBRIDGE_PATHS = {
 window.AGENTBRIDGE_WEBCHAT = {
   sender: "Mobile-WebChat",
   clientType: "webchat",
-  historyLimit: 100
+  historyLimit: 100,
+  DEBUG_MODE: true
 };
