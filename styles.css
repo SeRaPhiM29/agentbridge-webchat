@@ -126,24 +126,23 @@ h1 {
 
   flex-wrap: wrap;
   justify-content: flex-end;
+  align-items:center;
 }
 
 
 .connection-pill,
 .ai-pill {
-  border-radius: 999px;
+    border-radius:999px;
+    padding:6px 10px;
+    font-size:12px;
+    font-weight:800;
+    white-space:nowrap;
 
-  padding: 6px 10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
-  font-size: 12px;
-  font-weight: 800;
-
-  white-space: nowrap;
-
-  border: 1px solid var(--border);
-
-  background:
-    rgba(15, 23, 42, 0.68);
+    border:1px solid var(--border);
 }
 
 
@@ -248,12 +247,10 @@ h1 {
 
 
 .session-header {
-  display: flex;
-
-  align-items: flex-start;
-  justify-content: space-between;
-
-  gap: 10px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
 }
 
 
@@ -436,21 +433,20 @@ h1 {
 
   grid-template-columns: 1fr 1fr;
 
-  gap: 8px;
-
-  margin-top: 10px;
+  gap:6px;
+  
+  margin-top:8px;
 }
 
 
 .secondary-button,
 .danger-button {
-  min-height: 40px;
-
-  border-radius: 14px;
-
-  font-weight: 900;
-
-  cursor: pointer;
+    min-height:32px;
+    height:34px;
+    padding: 0 8px;
+    border-radius:12px;
+    font-size:12px;
+    font-weight:800;
 }
 
 
@@ -633,63 +629,50 @@ h1 {
 
 
 /* COPY BUTTON */
-
 .copy-message-btn {
 
-    position: absolute;
+    position:absolute;
 
-    top: 8px;
+    top:8px;
 
-    right: 8px;
-
-    width: 32px;
-
-    height: 32px;
+    right:8px;
 
 
-    display: flex;
+    width:26px;
 
-    align-items: center;
-
-    justify-content: center;
+    height:26px;
 
 
-    border-radius: 10px;
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+
+    border-radius:50%;
 
 
     border:
-    1px solid rgba(255,255,255,0.14);
+    1px solid rgba(255,255,255,0.12);
 
 
     background:
     rgba(255,255,255,0.08);
 
 
-    color:
-    rgba(255,255,255,0.85);
+    color:white;
 
 
-    cursor: pointer;
+    cursor:pointer;
 
 
-    font-size: 15px;
-
-
-    backdrop-filter:
-    blur(12px);
+    font-size:13px;
 
 
     transition:
-    transform 160ms ease,
-    background 160ms ease,
-    color 160ms ease;
-}
-
-
-.copy-message-btn:hover {
-
-    background:
-    rgba(255,255,255,0.16);
+    transform .18s ease,
+    background .18s ease;
 
 }
 
@@ -697,7 +680,7 @@ h1 {
 .copy-message-btn:active {
 
     transform:
-    scale(0.88);
+    scale(.82);
 
 }
 
@@ -705,41 +688,29 @@ h1 {
 .copy-message-btn.copied {
 
     background:
-    rgba(34,197,94,0.22);
-
-
-    color:
-    #86efac;
+    rgba(34,197,94,.25);
 
 
     animation:
-    copyPop 320ms ease;
+    copyPop .3s ease;
+
 }
 
 
 @keyframes copyPop {
 
     0% {
-
-        transform:
-        scale(0.85);
-
+        transform:scale(.8);
     }
 
 
-    55% {
-
-        transform:
-        scale(1.15);
-
+    60% {
+        transform:scale(1.15);
     }
 
 
     100% {
-
-        transform:
-        scale(1);
-
+        transform:scale(1);
     }
 
 }
@@ -1040,21 +1011,22 @@ button:disabled {
 
 
   .session-card {
-    padding: 10px;
-
-    border-radius: 18px;
+    padding: 8px;
+    border-radius: 16px;
   }
 
 
   .session-grid {
     gap: 7px;
   }
-
+  
+  .status-container {
+  flex-shrink:0;
+  }
 
   .session-item {
-    padding: 8px;
-
-    border-radius: 12px;
+    padding:6px 8px;
+    border-radius:10px;
   }
 
 
@@ -1069,6 +1041,34 @@ button:disabled {
     max-width:
       90%;
   }
+  .warning-banner {
+  
+          padding:8px 10px;
+  
+          border-radius:14px;
+  
+      }
+  
+  
+      .warning-title {
+  
+          font-size:12px;
+  
+      }
+  
+  
+      .warning-message {
+  
+          font-size:12px;
+  
+      }
+  
+  
+      .usage-bar-wrap {
+  
+          margin-top:7px;
+  
+      }
 
 }
 
