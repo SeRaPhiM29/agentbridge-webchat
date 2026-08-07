@@ -316,7 +316,13 @@
     els.messageInput.addEventListener("input", autoResizeInput);
 
     els.messageInput.addEventListener("keydown", function (event) {
-      if (event.key === "Enter" && !event.shiftKey) {
+      const isMobile = window.matchMedia("(max-width: 719px)").matches;
+    
+      if (
+        !isMobile &&
+        event.key === "Enter" &&
+        !event.shiftKey
+      ) {
         event.preventDefault();
         sendChatMessage();
       }
@@ -425,8 +431,7 @@
 
     els.messageInput.value = "";
     autoResizeInput();
-
-    await writeInboxPayload(payload, "Message sent to AgentBridge");
+    await writeInboxPayload(payload);
   }
 
   async function sendControlCommand(action, label) {
