@@ -25,9 +25,24 @@
         <h1>Mobile Web Chat</h1>
       </div>
 
-      <div id="connectionPill" class="connection-pill offline">
-        Offline
-      </div>
+<div class="status-container">
+  <div id="connectionPill" class="connection-pill offline">
+    Offline
+  </div>
+
+  <div id="aiStatusPill" class="connection-pill ai-pill">
+    AI Unknown
+  </div>
+
+  <button
+      id="soundToggleBtn"
+      class="sound-icon-button"
+      type="button"
+      title="Toggle notification sound">
+      🔔
+  </button>
+</div>
+
     </header>
 
     <section id="warningBanner" class="warning-banner hidden">
@@ -41,7 +56,16 @@
       <div class="session-header">
         <div>
           <div class="section-label">Active Session</div>
-          <div id="threadShort" class="thread-short">No active thread</div>
+          <div id="threadShort" class="thread-short">
+              No active thread
+          </div>
+
+          <div
+              id="sessionTitle"
+              class="session-title"
+          >
+              Session title unavailable
+          </div>
         </div>
 
         <button id="refreshButton" class="icon-button" type="button" title="Refresh">
@@ -75,12 +99,7 @@
         <div id="usageBar" class="usage-bar"></div>
       </div>
 
-    <div class="notification-row">
-        <label>
-            <input type="checkbox" id="soundToggle" checked>
-            🔔 Sound Notification
-        </label>
-    </div>
+
 
       <div class="session-actions">
         <button id="saveNotesButton" class="secondary-button" type="button">
