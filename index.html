@@ -20,120 +20,272 @@
 <body>
   <div class="app-shell">
     <header class="top-bar">
-      <div>
-        <div class="eyebrow">AgentBridge</div>
-        <h1>Mobile Web Chat</h1>
+
+  <div class="brand-area">
+    <div class="eyebrow">AGENTBRIDGE</div>
+    <h1>Web Chat</h1>
+  </div>
+
+  <div class="status-container">
+
+    <button
+      id="soundToggleBtn"
+      class="sound-toggle"
+      type="button"
+      aria-label="Toggle notification sound"
+      title="Toggle notification sound"
+    >
+      <span class="sound-icon">🔔</span>
+    </button>
+
+    <div
+      id="connectionPill"
+      class="connection-pill offline"
+    >
+      Offline
+    </div>
+
+    <div
+      id="aiStatusPill"
+      class="connection-pill ai-pill"
+    >
+      AI Unknown
+    </div>
+
+  </div>
+
+</header>
+
+
+<section
+  id="warningBanner"
+  class="warning-banner hidden"
+>
+
+  <div
+    id="warningTitle"
+    class="warning-title"
+  >
+    Context warning
+  </div>
+
+  <div
+    id="warningMessage"
+    class="warning-message"
+  >
+    Token usage is getting high.
+  </div>
+
+</section>
+
+
+<section class="session-card">
+
+  <div class="session-header">
+
+    <div class="session-identity">
+
+      <div
+        id="threadShort"
+        class="thread-short"
+      >
+        No active thread
       </div>
 
-<div class="status-container">
-  <div id="connectionPill" class="connection-pill offline">
-    Offline
+
+      <div
+        id="sessionTitle"
+        class="session-title"
+      >
+        -
+      </div>
+
+    </div>
+
+
+    <button
+      id="refreshButton"
+      class="icon-button"
+      type="button"
+      title="Refresh"
+      aria-label="Refresh session"
+    >
+      ↻
+    </button>
+
   </div>
 
-  <div id="aiStatusPill" class="connection-pill ai-pill">
-    AI Unknown
+
+
+  <div class="session-grid">
+
+
+    <div class="session-item">
+
+      <span class="item-label">
+        Started
+      </span>
+
+      <span
+        id="startedAt"
+        class="item-value"
+      >
+        Unknown
+      </span>
+
+    </div>
+
+
+
+    <div class="session-item">
+
+      <span class="item-label">
+        Questions
+      </span>
+
+      <span
+        id="questionCount"
+        class="item-value"
+      >
+        0
+      </span>
+
+    </div>
+
+
+
+    <div class="session-item">
+
+      <span class="item-label">
+        Tokens
+      </span>
+
+      <span
+        id="totalTokens"
+        class="item-value"
+      >
+        0
+      </span>
+
+    </div>
+
+
+
+    <div class="session-item">
+
+      <span class="item-label">
+        Usage
+      </span>
+
+      <span
+        id="usagePercent"
+        class="item-value"
+      >
+        0%
+      </span>
+
+    </div>
+
+
   </div>
+
+
+
+  <div class="usage-bar-wrap">
+
+    <div
+      id="usageBar"
+      class="usage-bar"
+    ></div>
+
+  </div>
+
+
+
+  <div class="session-actions">
+
+
+    <button
+      id="saveNotesButton"
+      class="secondary-button"
+      type="button"
+    >
+      Save Notes
+    </button>
+
+
+
+    <button
+      id="newSessionButton"
+      class="danger-button"
+      type="button"
+    >
+      New Session
+    </button>
+
+
+  </div>
+
+
+</section>
+
+
+
+<main
+  id="chatList"
+  class="chat-list"
+>
+
+  <div class="empty-state">
+
+    <div class="empty-icon">
+      🤖
+    </div>
+
+
+    <div class="empty-title">
+      Waiting for AgentBridge history
+    </div>
+
+
+    <div class="empty-subtitle">
+      Messages will appear here after AgentBridge writes to Firebase history.
+    </div>
+
+
+  </div>
+
+</main>
+
+
+
+<form
+  id="chatForm"
+  class="composer"
+  autocomplete="off"
+>
+
+
+  <textarea
+    id="messageInput"
+    rows="1"
+    placeholder="Type a message to ChipAgents..."
+    spellcheck="true"
+  ></textarea>
+
+
 
   <button
-      id="soundToggleBtn"
-      class="sound-icon-button"
-      type="button"
-      title="Toggle notification sound">
-      🔔
+    id="sendButton"
+    class="send-button"
+    type="submit"
+  >
+    Send
   </button>
-</div>
-
-    </header>
-
-    <section id="warningBanner" class="warning-banner hidden">
-      <div class="warning-title" id="warningTitle">Context warning</div>
-      <div class="warning-message" id="warningMessage">
-        Token usage is getting high.
-      </div>
-    </section>
-
-    <section class="session-card">
-      <div class="session-header">
-        <div>
-          <div class="section-label">Active Session</div>
-          <div id="threadShort" class="thread-short">
-              No active thread
-          </div>
-
-          <div
-              id="sessionTitle"
-              class="session-title"
-          >
-              Session title unavailable
-          </div>
-        </div>
-
-        <button id="refreshButton" class="icon-button" type="button" title="Refresh">
-          ↻
-        </button>
-      </div>
-
-      <div class="session-grid">
-        <div class="session-item">
-          <span class="item-label">Started</span>
-          <span id="startedAt" class="item-value">Unknown</span>
-        </div>
-
-        <div class="session-item">
-          <span class="item-label">Questions</span>
-          <span id="questionCount" class="item-value">0</span>
-        </div>
-
-        <div class="session-item">
-          <span class="item-label">Tokens</span>
-          <span id="totalTokens" class="item-value">0</span>
-        </div>
-
-        <div class="session-item">
-          <span class="item-label">Usage</span>
-          <span id="usagePercent" class="item-value">0%</span>
-        </div>
-      </div>
-
-      <div class="usage-bar-wrap">
-        <div id="usageBar" class="usage-bar"></div>
-      </div>
 
 
-
-      <div class="session-actions">
-        <button id="saveNotesButton" class="secondary-button" type="button">
-          Save Session Notes
-        </button>
-
-        <button id="newSessionButton" class="danger-button" type="button">
-          New AI Session
-        </button>
-      </div>
-    </section>
-
-    <main id="chatList" class="chat-list">
-      <div class="empty-state">
-        <div class="empty-icon">🤖</div>
-        <div class="empty-title">Waiting for AgentBridge history</div>
-        <div class="empty-subtitle">
-          Messages will appear here after AgentBridge writes to Firebase history.
-        </div>
-      </div>
-    </main>
-
-    <form id="chatForm" class="composer" autocomplete="off">
-      <textarea
-        id="messageInput"
-        rows="1"
-        placeholder="Type a message to ChipAgents..."
-        spellcheck="true"
-      ></textarea>
-
-      <button id="sendButton" class="send-button" type="submit">
-        Send
-      </button>
-    </form>
+</form>
+    
   </div>
 
   <div id="toast" class="toast hidden"></div>
