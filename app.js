@@ -15,6 +15,7 @@
     pendingLocalMessages: [],
     activeSession: null,
     latestOutbox: null,
+    copyPayloads: [],
     clientId: getOrCreateClientId()
   };
 
@@ -25,6 +26,10 @@
     warningMessage: document.getElementById("warningMessage"),
 
     threadShort: document.getElementById("threadShort"),
+    sessionTitle:
+        document.getElementById(
+            "sessionTitle"
+        ),
     startedAt: document.getElementById("startedAt"),
     questionCount: document.getElementById("questionCount"),
     totalTokens: document.getElementById("totalTokens"),
@@ -42,6 +47,10 @@
 
     toast: document.getElementById("toast")
   };
+
+ 
+  const DEBUG_MODE =
+    window.AGENTBRIDGE_WEBCHAT?.DEBUG_MODE ?? false;
 
   boot();
 
@@ -71,6 +80,7 @@
       state.refs.outboxLatest = state.db.ref(window.AGENTBRIDGE_PATHS.outboxLatest);
       state.refs.history = state.db.ref(window.AGENTBRIDGE_PATHS.history);
       state.refs.activeSession = state.db.ref(window.AGENTBRIDGE_PATHS.activeSession);
+      state.refs.status = state.db.ref("agentBridge/status");
       state.refs.connected = state.db.ref(".info/connected");
 
       attachListeners();
@@ -84,6 +94,8 @@
   }
 
   function attachListeners() {
+
+
     state.refs.connected.on("value", function (snapshot) {
       state.connected = snapshot.val() === true;
       renderConnection();
@@ -149,34 +161,153 @@
         removeMatchingPendingFromHistory(items);
         renderChat();
       });
+
+
+    state.refs.status.on("value", function(snapshot) {
+
+        const status = snapshot.val();
+
+        const aiPill =
+            document.getElementById(
+                "aiStatusPill"
+            );
+
+        const connectionPill =
+            document.getElementById(
+                "connectionPill"
+            );
+
+        if (
+            !aiPill ||
+            !connectionPill
+        ) {
+            return;
+        }
+
+        //
+        // PRODUCTION MODE
+        //
+        if (!DEBUG_MODE) {
+
+            aiPill.style.display = "none";
+
+            let ready = false;
+
+            if (
+                status &&
+                status.ai_ready === true &&
+                status.last_seen
+            ) {
+
+                const parsedDate =
+                    new Date(
+                        status.last_seen
+                    );
+
+                if (
+                    !isNaN(
+                        parsedDate.getTime()
+                    )
+                ) {
+
+                    ready =
+                        (
+                            Date.now() -
+                            parsedDate.getTime()
+                        ) < 120000;
+                }
+            }
+
+            connectionPill.textContent =
+                ready
+                    ? "Ready"
+                    : "Unavailable";
+
+            return;
+        }
+
+        //
+        // DEBUG MODE
+        //
+        aiPill.style.display = "";
+
+        if (!status) {
+
+            aiPill.textContent =
+                "AI Unknown";
+
+            return;
+        }
+
+        const lastSeen =
+            status.last_seen;
+
+        if (
+            !lastSeen ||
+            status.ai_ready !== true
+        ) {
+
+            aiPill.textContent =
+                "AI Offline";
+
+            return;
+        }
+
+        const parsedDate =
+            new Date(lastSeen);
+
+        if (
+            isNaN(
+                parsedDate.getTime()
+            )
+        ) {
+
+            aiPill.textContent =
+                "AI Offline";
+
+            return;
+        }
+
+        const ageMs =
+            Date.now() -
+            parsedDate.getTime();
+
+        const isFresh =
+            ageMs < 120000;
+
+        aiPill.textContent =
+            isFresh
+                ? "AI Ready"
+                : "AI Offline";
+    });
   }
 
   function attachUiEvents() {
 
-    const soundToggle =
-        document.getElementById("soundToggle");
+    const soundToggleBtn =
+        document.getElementById("soundToggleBtn");
 
-    if (soundToggle) {
+    if (soundToggleBtn) {
 
-        soundToggle.checked =
-            state.soundEnabled;
+        updateSoundIcon();
 
-        soundToggle.addEventListener(
-            "change",
+        soundToggleBtn.addEventListener(
+            "click",
             function () {
 
                 state.soundEnabled =
-                    this.checked;
+                    !state.soundEnabled;
 
                 localStorage.setItem(
                     "soundEnabled",
-                    this.checked
+                    state.soundEnabled
                 );
 
+                updateSoundIcon();
             }
         );
+    }
 
-    }    
     els.chatForm.addEventListener("submit", function (event) {
       event.preventDefault();
       sendChatMessage();
@@ -190,6 +321,10 @@
         sendChatMessage();
       }
     });
+
+    if (!DEBUG_MODE) {
+        els.refreshButton.style.display = "none";
+    }
 
     els.refreshButton.addEventListener("click", function () {
       renderActiveSession();
@@ -212,8 +347,60 @@
 
       sendControlCommand("new_session", "New AI session");
     });
+
+    els.chatList.addEventListener(
+        "click",
+        async function(event) {
+
+            const btn =
+                event.target.closest(
+                    ".copy-message-btn"
+                );
+
+            if (!btn) {
+                return;
+            }
+
+            const index = parseInt(
+                btn.dataset.copyIndex,
+                10
+            );
+
+            const text =
+                state.copyPayloads[index];
+
+            if (!text) {
+                return;
+            }
+
+            try {
+
+                await navigator.clipboard
+                    .writeText(text);
+
+                btn.textContent = "✅";
+
+                setTimeout(
+                    function() {
+                        btn.textContent = "⧉";
+                    },
+                    2000
+                );
+
+            } catch (err) {
+
+                console.error(err);
+
+                showToast(
+                    "Copy failed"
+                );
+            }
+        }
+    );
   }
 
+
+ 
   async function sendChatMessage() {
     const text = els.messageInput.value.trim();
 
@@ -367,9 +554,11 @@
 
   function renderActiveSession() {
     const session = state.activeSession || {};
-
+    const sessionTitle =
+        session.title ||
+        session.session_title ||
+        "";
     const threadId = safeText(session.thread_id || "");
-    const shortThread = threadId ? shortenThreadId(threadId) : "No active thread";
 
     const startedAt = session.started_at || session.startedAt || "Unknown";
     const questionCount = toInt(session.question_count, 0);
@@ -389,7 +578,14 @@
 
     const warningLevel = normalizeWarningLevel(session.warning_level, usage);
 
-    els.threadShort.textContent = shortThread;
+    els.threadShort.textContent =
+        threadId || "No active thread";
+    if (els.sessionTitle) {
+
+        els.sessionTitle.textContent =
+            sessionTitle ||
+            "Session title unavailable";
+    }
     els.startedAt.textContent = safeText(startedAt);
     els.questionCount.textContent = String(questionCount);
     els.totalTokens.textContent = formatNumber(totalTokens);
@@ -481,6 +677,7 @@
       return;
     }
 
+    state.copyPayloads = [];
     const shouldStickToBottom = isNearBottom(els.chatList);
 
     els.chatList.innerHTML = rows.map(renderMessageRow).join("");
@@ -494,17 +691,55 @@
 
 
   function renderMessageRow(row) {
-    const roleClass = row.role === "user" ? "user" : "agent";
+
+    const roleClass =
+        row.role === "user"
+            ? "user"
+            : "agent";
+
+    let copyButton = "";
+
+    if (row.role === "agent") {
+
+        const copyIndex =
+            state.copyPayloads.length;
+
+        state.copyPayloads.push(
+            row.text || ""
+        );
+
+        copyButton =
+            '<button ' +
+            'class="copy-message-btn" ' +
+            'data-copy-index="' +
+            copyIndex +
+            '">' +
+            '⧉' +
+            '</button>';
+    }
 
     return [
-      '<div class="message-row ', roleClass, '">',
-      '<div class="message-bubble">',
-      '<div class="message-meta">', escapeHtml(row.meta), '</div>',
-      '<div>', escapeHtml(row.text), '</div>',
-      '</div>',
-      '</div>'
+        '<div class="message-row ',
+        roleClass,
+        '">',
+
+        '<div class="message-bubble">',
+
+        copyButton,
+
+        '<div class="message-meta">',
+        escapeHtml(row.meta),
+        '</div>',
+
+        '<div class="message-text">',
+        escapeHtml(row.text),
+        '</div>',
+
+        '</div>',
+        '</div>'
     ].join("");
-  }
+}
+
 
   function buildMeta(name, timeValue, extra) {
     const parts = [];
@@ -517,12 +752,8 @@
       parts.push(formatMaybeTimestamp(timeValue));
     }
 
-    if (extra) {
-      if (extra === "pending") {
-        parts.push("Pending");
-      } else {
-        parts.push("Thread " + shortenThreadId(extra));
-      }
+    if (extra === "pending") {
+    parts.push("Pending");
     }
 
     return parts.join(" • ");
@@ -801,4 +1032,23 @@ function playReplySound() {
     });
 }
 
+function updateSoundIcon() {
+
+    const btn =
+        document.getElementById(
+            "soundToggleBtn"
+        );
+
+    if (!btn) {
+        return;
+    }
+
+    btn.textContent =
+        state.soundEnabled
+            ? "🔔"
+            : "🔕";
+}
+
 })();
+
+ 
