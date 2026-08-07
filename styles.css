@@ -635,56 +635,113 @@ h1 {
 /* COPY BUTTON */
 
 .copy-message-btn {
-  position: absolute;
 
-  top: 8px;
+    position: absolute;
 
-  right: 8px;
+    top: 8px;
 
-  width: 30px;
+    right: 8px;
 
-  height: 30px;
+    width: 32px;
 
-  display: flex;
+    height: 32px;
 
-  align-items: center;
 
-  justify-content: center;
+    display: flex;
 
-  border-radius: 10px;
+    align-items: center;
 
-  border:
-    1px solid rgba(255,255,255,0.12);
+    justify-content: center;
 
-  background:
+
+    border-radius: 10px;
+
+
+    border:
+    1px solid rgba(255,255,255,0.14);
+
+
+    background:
     rgba(255,255,255,0.08);
 
-  color: white;
 
-  cursor: pointer;
+    color:
+    rgba(255,255,255,0.85);
 
-  font-size: 15px;
 
-  transition:
-    transform 150ms ease,
-    background 150ms ease;
+    cursor: pointer;
+
+
+    font-size: 15px;
+
+
+    backdrop-filter:
+    blur(12px);
+
+
+    transition:
+    transform 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+
+.copy-message-btn:hover {
+
+    background:
+    rgba(255,255,255,0.16);
+
 }
 
 
 .copy-message-btn:active {
-  transform: scale(0.88);
 
-  background:
-    rgba(255,255,255,0.18);
+    transform:
+    scale(0.88);
+
 }
 
 
 .copy-message-btn.copied {
-  background:
-    rgba(34,197,94,0.25);
 
-  color:
-    #bbf7d0;
+    background:
+    rgba(34,197,94,0.22);
+
+
+    color:
+    #86efac;
+
+
+    animation:
+    copyPop 320ms ease;
+}
+
+
+@keyframes copyPop {
+
+    0% {
+
+        transform:
+        scale(0.85);
+
+    }
+
+
+    55% {
+
+        transform:
+        scale(1.15);
+
+    }
+
+
+    100% {
+
+        transform:
+        scale(1);
+
+    }
+
 }
 
 /* COMPOSER */
@@ -825,7 +882,73 @@ h1 {
     rgba(255,255,255,0.12);
 }
 
+.sound-toggle {
 
+    width: 38px;
+
+    height: 38px;
+
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+
+    border-radius:50%;
+
+
+    border:
+    1px solid var(--border);
+
+
+    background:
+    rgba(15,23,42,0.75);
+
+
+    cursor:pointer;
+
+
+    color:white;
+
+
+    transition:
+    transform 160ms ease,
+    background 160ms ease;
+
+}
+
+
+.sound-toggle:active {
+
+    transform:
+    scale(0.9);
+
+}
+
+
+.sound-toggle .sound-icon {
+
+    display:block;
+
+    font-size:17px;
+
+    transition:
+    transform 180ms ease,
+    opacity 180ms ease;
+
+}
+
+
+.sound-toggle.muted .sound-icon {
+
+    transform:
+    scale(.85);
+
+    opacity:.45;
+
+}
 
 /* TOAST */
 
