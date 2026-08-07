@@ -378,14 +378,20 @@
                 await navigator.clipboard
                     .writeText(text);
 
-                btn.textContent = "✅";
-
-                setTimeout(
-                    function() {
-                        btn.textContent = "⧉";
-                    },
-                    2000
-                );
+                  btn.classList.add("copied");
+                  
+                  btn.textContent = "✓";
+                  
+                  setTimeout(
+                      function() {
+                  
+                          btn.classList.remove("copied");
+                  
+                          btn.textContent = "⧉";
+                  
+                      },
+                      1800
+                  );
 
             } catch (err) {
 
@@ -555,9 +561,12 @@
   function renderActiveSession() {
     const session = state.activeSession || {};
     const sessionTitle =
-        session.title ||
-        session.session_title ||
-        "";
+    session.title ||
+    session.session_title ||
+    session.name ||
+    session.label ||
+    session.topic ||
+    "";
     const threadId = safeText(session.thread_id || "");
 
     const startedAt = session.started_at || session.startedAt || "Unknown";
@@ -584,7 +593,7 @@
 
         els.sessionTitle.textContent =
             sessionTitle ||
-            "Session title unavailable";
+            "-";
     }
     els.startedAt.textContent = safeText(startedAt);
     els.questionCount.textContent = String(questionCount);
@@ -1034,19 +1043,43 @@ function playReplySound() {
 
 function updateSoundIcon() {
 
-    const btn =
-        document.getElementById(
-            "soundToggleBtn"
-        );
+const btn =
+    document.getElementById(
+        "soundToggleBtn"
+    );
 
-    if (!btn) {
-        return;
-    }
 
-    btn.textContent =
-        state.soundEnabled
-            ? "🔔"
-            : "🔕";
+if (!btn) {
+
+    return;
+
+}
+
+
+const icon =
+    btn.querySelector(
+        ".sound-icon"
+    );
+
+
+if (!icon) {
+
+    return;
+
+}
+
+
+btn.classList.toggle(
+    "muted",
+    !state.soundEnabled
+);
+
+
+icon.textContent =
+    state.soundEnabled
+        ? "🔔"
+        : "🔕";
+
 }
 
 })();
