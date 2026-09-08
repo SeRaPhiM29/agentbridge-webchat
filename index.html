@@ -136,36 +136,57 @@
   <!-- Session card collapse toggle (no app.js involvement) -->
   <script>
   (function () {
-    var card    = document.getElementById('sessionCard');
-    var btn     = document.getElementById('collapseBtn');
-    var chatList = document.getElementById('chatList');
+    try {
+      var card     = document.getElementById('sessionCard');
+      var btn      = document.getElementById('collapseBtn');
+      var chatList = document.getElementById('chatList');
+      if (!card || !btn || !chatList) { return; }
 
-    function setCollapsed(collapsed) {
-      card.classList.toggle('collapsed', collapsed);
-      btn.textContent = collapsed ? '▸' : '▾';
-    }
-
-    // Restore saved preference
-    var saved = localStorage.getItem('sessionCardCollapsed');
-    if (saved === 'true') { setCollapsed(true); }
-
-    btn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      var next = !card.classList.contains('collapsed');
-      setCollapsed(next);
-      localStorage.setItem('sessionCardCollapsed', next);
-    });
-
-    // Auto-collapse once messages load, only if user has no saved preference
-    var observer = new MutationObserver(function () {
-      if (localStorage.getItem('sessionCardCollapsed') !== null) { return; }
-      if (chatList.querySelector('.message-row')) {
-        setCollapsed(true);
-        localStorage.setItem('sessionCardCollapsed', 'true');
-        observer.disconnect();
+      function setCollapsed(collapsed) {
+        card.classList.toggle('collapsed', collapsed);
+        btn.textContent = collapsed ? '▸' : '▾';
       }
-    });
-    observer.observe(chatList, { childList: true });
+
+      var saved = localStorage.getItem('sessionCardCollapsed');
+      if (saved === 'true') { setCollapsed(true); }
+
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var next = !card.classList.contains('collapsed');
+        setCollapsed(next);
+        localStorage.setItem('sessionCardCollapsed', String(next));
+      });
+
+      var observer = new MutationObserver(function () {
+        if (localStorage.getItem('sessionCardCollapsed') !== null) { return; }
+        if (chatList.querySelector('.message-row')) {
+          setCollapsed(true);
+          localStorage.setItem('sessionCardCollapsed', 'true');
+          observer.disconnect();
+        }
+      });
+      observer.observe(chatList, { childList: true });
+    } catch (e) {
+      console.error('[AgentBridge collapse]', e);
+    }
+  })();
+
+  /* Bell: play replySound once when toggling sound ON, as a handshake beep.
+     This listener fires before app.js's listener, so localStorage still holds
+     the current (pre-flip) state — if it's 'false', the user is enabling sound. */
+  (function () {
+    try {
+      var bell = document.getElementById('soundToggleBtn');
+      if (!bell) { return; }
+      bell.addEventListener('click', function () {
+        var currentlyOff = localStorage.getItem('soundEnabled') === 'false';
+        if (!currentlyOff) { return; }
+        var audio = document.getElementById('replySound');
+        if (!audio) { return; }
+        audio.currentTime = 0;
+        audio.play().catch(function () {});
+      });
+    } catch (e) {}
   })();
   </script>
 
