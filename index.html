@@ -1,300 +1,175 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0f172a" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="theme-color" content="#07100e"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <title>AgentBridge</title>
 
-  <title>AgentBridge Mobile Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css"/>
 
-  <!-- Firebase compat SDKs for simple static browser usage -->
- 
-<script src="firebase-config.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
-
+  <script src="firebase-config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 </head>
-
 <body>
   <div class="app-shell">
+
+    <!-- ── HEADER ── -->
     <header class="top-bar">
+      <div class="app-brand">
+        <span class="app-wordmark">AgentBridge</span>
+        <!--
+          connectionPill: app.js toggles .online/.offline and sets textContent.
+          Styled as a 7px dot via CSS; font-size:0 hides the text.
+        -->
+        <span id="connectionPill" class="connection-pill offline"></span>
+        <!--
+          aiStatusPill: app.js hides this in production (display:none),
+          shows and updates text in debug mode.
+        -->
+        <span id="aiStatusPill" class="ai-badge"></span>
+      </div>
+      <div class="header-right">
+        <button id="soundToggleBtn" class="icon-btn" type="button" title="Toggle notification sound">
+          🔔
+        </button>
+      </div>
+    </header>
 
-  <div class="brand-area">
-    <div class="eyebrow">AGENTBRIDGE</div>
-    <h1>Web Chat</h1>
-  </div>
+    <!-- ── WARNING BANNER (hidden by default, shown by app.js) ── -->
+    <section id="warningBanner" class="warning-banner hidden">
+      <span class="warn-icon">⚠</span>
+      <div>
+        <div class="warn-title" id="warningTitle">Context warning</div>
+        <div class="warn-msg"   id="warningMessage">Token usage is getting high.</div>
+      </div>
+    </section>
 
-  <div class="status-container">
+    <!-- ── SESSION CARD (collapsible) ── -->
+    <section class="session-card" id="sessionCard">
 
-    <button
-      id="soundToggleBtn"
-      class="sound-toggle"
-      type="button"
-      aria-label="Toggle notification sound"
-      title="Toggle notification sound"
-    >
-      <span class="sound-icon">🔔</span>
-    </button>
-
-    <div
-      id="connectionPill"
-      class="connection-pill offline"
-    >
-      Offline
-    </div>
-
-    <div
-      id="aiStatusPill"
-      class="connection-pill ai-pill"
-    >
-      AI Unknown
-    </div>
-
-  </div>
-
-</header>
-
-
-<section
-  id="warningBanner"
-  class="warning-banner hidden"
->
-
-  <div
-    id="warningTitle"
-    class="warning-title"
-  >
-    Context warning
-  </div>
-
-  <div
-    id="warningMessage"
-    class="warning-message"
-  >
-    Token usage is getting high.
-  </div>
-
-</section>
-
-
-<section class="session-card">
-
-  <div class="session-header">
-
-    <div class="session-identity">
-
-      <div
-        id="threadShort"
-        class="thread-short"
-      >
-        No active thread
+      <div class="session-head">
+        <div class="session-id-row">
+          <!-- threadShort: app.js writes shortened thread ID here -->
+          <div id="threadShort" class="session-thread">No active thread</div>
+          <!-- sessionTitle: app.js writes title or "Session title unavailable" -->
+          <div id="sessionTitle" class="session-title-text"></div>
+        </div>
+        <div class="session-head-right">
+          <!-- refreshButton: hidden in production by app.js, shown in debug -->
+          <button id="refreshButton" class="icon-btn" type="button" title="Refresh">↻</button>
+          <!-- collapseBtn: not referenced by app.js, handled by inline script -->
+          <button id="collapseBtn" class="icon-btn" type="button" title="Toggle session info">▾</button>
+        </div>
       </div>
 
+      <!-- Collapsible body: stats + actions -->
+      <div class="session-body">
+        <div class="session-stats">
+          <div>
+            <span class="stat-label">Started</span>
+            <span class="stat-value" id="startedAt">—</span>
+          </div>
+          <div>
+            <span class="stat-label">Questions</span>
+            <span class="stat-value" id="questionCount">0</span>
+          </div>
+          <div>
+            <span class="stat-label">Tokens</span>
+            <span class="stat-value" id="totalTokens">0</span>
+          </div>
+          <div>
+            <span class="stat-label">Context</span>
+            <span class="stat-value" id="usagePercent">0%</span>
+          </div>
+        </div>
 
-      <div
-        id="sessionTitle"
-        class="session-title"
-      >
-        -
+        <div class="session-actions">
+          <button id="saveNotesButton" class="action-btn save" type="button">Save Notes</button>
+          <button id="newSessionButton" class="action-btn nuke"  type="button">New Session</button>
+        </div>
       </div>
 
-    </div>
-
-
-    <button
-      id="refreshButton"
-      class="icon-button"
-      type="button"
-      title="Refresh"
-      aria-label="Refresh session"
-    >
-      ↻
-    </button>
-
-  </div>
-
-
-
-  <div class="session-grid">
-
-
-    <div class="session-item">
-
-      <span class="item-label">
-        Started
-      </span>
-
-      <span
-        id="startedAt"
-        class="item-value"
-      >
-        Unknown
-      </span>
-
-    </div>
-
-
-
-    <div class="session-item">
-
-      <span class="item-label">
-        Questions
-      </span>
-
-      <span
-        id="questionCount"
-        class="item-value"
-      >
-        0
-      </span>
-
-    </div>
-
-
-
-    <div class="session-item">
-
-      <span class="item-label">
-        Tokens
-      </span>
-
-      <span
-        id="totalTokens"
-        class="item-value"
-      >
-        0
-      </span>
-
-    </div>
-
-
-
-    <div class="session-item">
-
-      <span class="item-label">
-        Usage
-      </span>
-
-      <span
-        id="usagePercent"
-        class="item-value"
-      >
-        0%
-      </span>
-
-    </div>
-
-
-  </div>
-
-
-
-  <div class="usage-bar-wrap">
-
-    <div
-      id="usageBar"
-      class="usage-bar"
-    ></div>
-
-  </div>
-
-
-
-  <div class="session-actions">
-
-
-    <button
-      id="saveNotesButton"
-      class="secondary-button"
-      type="button"
-    >
-      Save Notes
-    </button>
-
-
-
-    <button
-      id="newSessionButton"
-      class="danger-button"
-      type="button"
-    >
-      New Session
-    </button>
-
-
-  </div>
-
-
-</section>
-
-
-
-<main
-  id="chatList"
-  class="chat-list"
->
-
-  <div class="empty-state">
-
-    <div class="empty-icon">
-      🤖
-    </div>
-
-
-    <div class="empty-title">
-      Waiting for AgentBridge history
-    </div>
-
-
-    <div class="empty-subtitle">
-      Messages will appear here after AgentBridge writes to Firebase history.
-    </div>
-
-
-  </div>
-
-</main>
-
-
-
-<form
-  id="chatForm"
-  class="composer"
-  autocomplete="off"
->
-
-
-  <textarea
-    id="messageInput"
-    rows="1"
-    placeholder="Type a message to ChipAgents..."
-    spellcheck="true"
-  ></textarea>
-
-
-
-  <button
-    id="sendButton"
-    class="send-button"
-    type="submit"
-  >
-    Send
-  </button>
-
-
-</form>
-    
-  </div>
+      <!-- Usage bar: always visible even when collapsed -->
+      <div class="usage-track">
+        <div id="usageBar" class="usage-bar"></div>
+      </div>
+
+    </section>
+
+    <!-- ── CHAT LIST ── -->
+    <main id="chatList" class="chat-list">
+      <div class="empty-state">
+        <div class="empty-icon">⬡</div>
+        <div class="empty-title">Waiting for AgentBridge</div>
+        <div class="empty-subtitle">
+          Messages will appear here once AgentBridge writes to Firebase history.
+        </div>
+      </div>
+    </main>
+
+    <!-- ── COMPOSER ── -->
+    <form id="chatForm" class="composer" autocomplete="off">
+      <textarea
+        id="messageInput"
+        rows="1"
+        placeholder="Ask ChipAgents…"
+        spellcheck="true"
+      ></textarea>
+      <button id="sendButton" class="send-btn" type="submit">Send</button>
+    </form>
+
+  </div><!-- /app-shell -->
 
   <div id="toast" class="toast hidden"></div>
 
+  <audio id="replySound" preload="auto">
+    <source src="ping.mp3" type="audio/mpeg">
+  </audio>
 
-<audio id="replySound" preload="auto">
-  <source src="ping.mp3" type="audio/mpeg">
-</audio>
+  <!-- Session card collapse toggle (no app.js involvement) -->
+  <script>
+  (function () {
+    var card    = document.getElementById('sessionCard');
+    var btn     = document.getElementById('collapseBtn');
+    var chatList = document.getElementById('chatList');
+
+    function setCollapsed(collapsed) {
+      card.classList.toggle('collapsed', collapsed);
+      btn.textContent = collapsed ? '▸' : '▾';
+    }
+
+    // Restore saved preference
+    var saved = localStorage.getItem('sessionCardCollapsed');
+    if (saved === 'true') { setCollapsed(true); }
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var next = !card.classList.contains('collapsed');
+      setCollapsed(next);
+      localStorage.setItem('sessionCardCollapsed', next);
+    });
+
+    // Auto-collapse once messages load, only if user has no saved preference
+    var observer = new MutationObserver(function () {
+      if (localStorage.getItem('sessionCardCollapsed') !== null) { return; }
+      if (chatList.querySelector('.message-row')) {
+        setCollapsed(true);
+        localStorage.setItem('sessionCardCollapsed', 'true');
+        observer.disconnect();
+      }
+    });
+    observer.observe(chatList, { childList: true });
+  })();
+  </script>
 
   <script src="app.js"></script>
 </body>
 </html>
+
