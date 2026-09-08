@@ -171,20 +171,28 @@
     }
   })();
 
-  /* Bell: play replySound once when toggling sound ON, as a handshake beep.
-     This listener fires before app.js's listener, so localStorage still holds
-     the current (pre-flip) state — if it's 'false', the user is enabling sound. */
+  /* Bell icon + sound.
+     This listener fires BEFORE app.js's (inline script loads first), so
+     localStorage still holds the pre-flip state — safe to compute next state here.
+     We drive the icon ourselves via innerHTML+rAF because Safari sometimes skips
+     repaints when app.js sets btn.textContent inside a flex button. */
   (function () {
     try {
       var bell = document.getElementById('soundToggleBtn');
       if (!bell) { return; }
       bell.addEventListener('click', function () {
-        var currentlyOff = localStorage.getItem('soundEnabled') === 'false';
-        if (!currentlyOff) { return; }
-        var audio = document.getElementById('replySound');
-        if (!audio) { return; }
-        audio.currentTime = 0;
-        audio.play().catch(function () {});
+        var currentlyOn = localStorage.getItem('soundEnabled') !== 'false';
+        var willBeOn    = !currentlyOn;
+
+        // Play handshake beep when enabling (must be inside user-gesture for iOS)
+        if (willBeOn) {
+          var audio = document.getElementById('replySound');
+          if (audio) { audio.currentTime = 0; audio.play().catch(function () {}); }
+        }
+
+        // Force icon repaint after app.js has also run its handler
+        var nextIcon = willBeOn ? '🔔' : '🔕';
+        requestAnimationFrame(function () { bell.innerHTML = nextIcon; });
       });
     } catch (e) {}
   })();
