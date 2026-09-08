@@ -54,10 +54,18 @@ button, textarea { font: inherit; }
 button {
   -webkit-tap-highlight-color: transparent;
   cursor: pointer;
+  transition: opacity 100ms ease;
+}
+button:active   { opacity: 0.6; }
+button:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* Spring press only on CTA buttons — NOT icon-btn, which updates its own textContent.
+   transform:scale() promotes to a GPU compositing layer in WebKit; textContent changes
+   inside that layer don't repaint until the transition settles (~120ms after tap). */
+.send-btn, .action-btn {
   transition: transform 120ms cubic-bezier(0.34,1.56,0.64,1), opacity 100ms ease;
 }
-button:active  { transform: scale(0.93); opacity: 0.75; }
-button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; }
+.send-btn:active, .action-btn:active { transform: scale(0.96); opacity: 0.85; }
 
 
 /* ── APP SHELL ── */
