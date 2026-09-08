@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   AGENTBRIDGE WEBCHAT — PHOSPHOR
+   AGENTBRIDGE WEBCHAT
    ═══════════════════════════════════════════ */
 
 :root {
@@ -142,16 +142,23 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
 }
 
 .icon-btn {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: 1px solid var(--border-strong);
-  background: transparent;
+  background: rgba(255,255,255,0.04);
   color: var(--muted);
-  font-size: 14px;
+  font-size: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Bell in the header gets a full 44pt iOS tap target */
+.header-right .icon-btn {
+  width: 44px;
+  height: 44px;
+  font-size: 16px;
 }
 
 
